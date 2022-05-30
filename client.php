@@ -65,5 +65,21 @@
 			$upd = $this->conn->prepare($query);
 			return $upd->execute();
 		}
+		public function checkPhone($phone){
+			if($phone == '') return false;
+
+			$query = "SELECT COUNT(*) FROM clients 
+			WHERE phone_1 = $phone or phone_2 = $phone or phone_3 = $phone";
+			$count = $this->conn->prepare($query);
+			$count->execute();
+			return $count->fetch()[0] > 0;
+		}
+		public function checkEmail($email){
+			$query = "SELECT COUNT(*) FROM clients 
+			WHERE email = '$email'";
+			$count = $this->conn->prepare($query);
+			$count->execute();
+			return $count->fetch()[0] > 0;
+		}
 	}
 ?>
