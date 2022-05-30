@@ -8,17 +8,29 @@
 
 	$client = new Client($db, 'clients');
 
-	if($_POST){
+	if($_POST['del']){ // удаление из базы и вывод сообщения вверху страницы
+		if ($client->delete($_POST['del'])) {
+        	echo "<div class='alert alert-success container'>Клиент Удален!</div>";
+    	}
+    	else {
+    		echo "<div class='alert alert-danger container'>Невозможно удалить клиента.</div>";
+    	}
+	}
+
+	if($_POST['first_name'] and $_POST['last_name'] and $_POST['email']){
 		// создание массива из данных post запроса
 		$arr = array($_POST['first_name'], $_POST['last_name'], $_POST['email'], 
 			$_POST['company_name'], $_POST['position'], $_POST['phone_1'], 
 			$_POST['phone_1'], $_POST['phone_2'], $_POST['phone_3']);
 
-		if ($client->create($arr)) { // добавление в базу и вывод сообщений вверху страницы
-        	echo "<div class='alert alert-success container'>Клиент Добавлен!</div>";
+		if ($client->create($arr)) { 
+		// добавление в базу и вывод сообщений вверху страницы
+        	echo "<div class='alert alert-success container'>
+        		Клиент Добавлен!</div>";
     	}
     	else {
-    		echo "<div class='alert alert-danger container'>Невозможно добавить клиента.</div>";
+    		echo "<div class='alert alert-danger container'>
+    			Невозможно добавить клиента.</div>";
     	}
 	}
 
@@ -31,7 +43,7 @@
 	}
 
 	$limit = 10;
-	$total = intdiv($client->length(), $limit) + 1;
+	$total = ceil($client->length() / $limit);
 
 	// если пользователь сам введет некорректное значение в поисковик
 	if($page <= 0) $page = 1;
@@ -40,6 +52,7 @@
 	$from = ($page - 1) * $limit;
 	
 	$read = $client->readPage($from, $limit);
+
 ?>
 
 
@@ -108,13 +121,18 @@
 					<th scope="col">Телефон 1</th>
 					<th scope="col">Телефон 2</th>
 					<th scope="col">Телефон 3</th>
+					<th scope="col">Действия</th>
 				</tr>
 		  	</thead>
 			<tbody>
 				<?php
 				$i = $from + 1;
+				$change = "<img src='https://www.citypng.com/public/uploads/preview/hd-blue-outline-short-pencil-icon-png-171630344411iwptmifhy2.png' width='20' height='20'";
+				$del = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Cross_red_circle.svg/1200px-Cross_red_circle.svg.png' width='20' height='20'";
+
 				while($row = $read->fetch()){
 					extract($row);
+					$id = $client->getIdThroughEmailField($email);
 					echo "<tr>";
 						echo "<th scope='row'>$i</th>";
 						echo "<td>$first_name</td>";
@@ -125,6 +143,16 @@
 						echo "<td>$phone_1</td>";
 						echo "<td>$phone_2</td>";
 						echo "<td>$phone_3</td>";
+						echo "<td><div class='row'>
+						<form action='index.php' method='post'>
+							<button class='btn btn-light'>$change</button>
+							<input type='hidden' value='$id' />
+						</form>
+						<form action='index.php' method='post'>
+							<button class='btn btn-light'>$del</button>
+							<input type='hidden' name='del' value='$id' />
+						</form>
+						</div></td>";
 					echo "</tr>";
 					$i++;
 				}
@@ -134,23 +162,23 @@
 	<?php  
 		echo "<div class='row'>";
 		// кнопка First (в начало)
-	    echo "<div class='col-md-1 offset-md-4'><a href='?page=1'><button class='btn-outline-dark'>First</button></a></div>";
+	    echo "<div class='col-md-1 offset-md-4'><a href='?page=1'><button class='btn btn-outline-dark'>First</button></a></div>";
 
 	    //кнопка Prev (предыдущая страница)
 	    echo "<div class='col-md-1'><a href='?page=". ($page - 1) . "'>
-	    	<button class='btn-outline-dark'";
+	    	<button class='btn btn-outline-dark'";
 	    if($page <= 1) echo " disabled";
 	    echo ">Prev</button></a></div>";
 
 	    // кнопка Next (следующее)
 	    echo "<div class='col-md-1'><a href='?page=". ($page + 1) . "'>
-	    	<button class='btn-outline-dark'";
+	    	<button class='btn btn-outline-dark'";
 	    if($page >= $total) echo " disabled";
 	    echo ">Next</button></a></div>";
 
 	    //кнопка Last (в конец)
 	    echo "<div class='col-md-1'><a href='?page=$total'>
-	    	<button class='btn-outline-dark'>Last</button></a></li></div>";
+	    	<button class='btn btn-outline-dark'>Last</button></a></li></div>";
 
 	    echo "</div><br>";
     ?>

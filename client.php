@@ -30,5 +30,18 @@
 			$count->execute();
 			return $count->fetch()[0];
 		}
+		
+		public function getIdThroughEmailField($email){
+			$query = "SELECT id FROM $this->table WHERE email='$email'";
+			$id = $this->conn->prepare($query);
+			$id->execute();
+			return $id->fetch()['id'];
+		}
+
+		public function delete($id){
+			$query = "DELETE FROM $this->table WHERE id = $id";
+			$del = $this->conn->prepare($query);
+			return $del->execute();
+		}
 	}
 ?>
