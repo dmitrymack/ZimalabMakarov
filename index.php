@@ -2,26 +2,45 @@
 	include_once 'database.php';
 	include_once 'client.php';
 
-	$db = new Database();
-	$db = $db->getConnection();
 
-	$client = new Client($db);
+	$db = new Database(); // класс Database создан мной
+	$db = $db->getConnection(); // подключение к базе
+
+	$client = new Client($db, 'clients');
 
 	if($_POST){
+		// создание массива из данных post запроса
 		$arr = array($_POST['first_name'], $_POST['last_name'], $_POST['email'], 
 			$_POST['company_name'], $_POST['position'], $_POST['phone_1'], 
 			$_POST['phone_1'], $_POST['phone_2'], $_POST['phone_3']);
-		if ($client->create($arr)) {
+
+		if ($client->create($arr)) { // добавление в базу и вывод сообщений вверху страницы
         	echo "<div class='alert alert-success container'>Клиент Добавлен!</div>";
     	}
     	else {
     		echo "<div class='alert alert-danger container'>Невозможно добавить клиента.</div>";
     	}
 	}
-	$read = $client->readAll();
+
+	// создание пагинации
+	if (isset($_GET['page'])) {
+    	$page = $_GET['page'];
+	} 
+	else { 
+    	$page = 1;
+	}
+
+	$limit = 10;
+	$total = intdiv($client->length(), $limit) + 1;
+
+	// если пользователь сам введет некорректное значение в поисковик
+	if($page <= 0) $page = 1;
+	else if ($page > $total) $page = $total;
+	
+	$from = ($page - 1) * $limit;
+	
+	$read = $client->readPage($from, $limit);
 ?>
-
-
 
 
 <!DOCTYPE html>
@@ -93,7 +112,7 @@
 		  	</thead>
 			<tbody>
 				<?php
-				$i = 1;
+				$i = $from + 1;
 				while($row = $read->fetch()){
 					extract($row);
 					echo "<tr>";
@@ -112,6 +131,30 @@
 				?>
 			</tbody>
 		</table>
+	<?php  
+		echo "<div class='row'>";
+		// кнопка First (в начало)
+	    echo "<div class='col-md-1 offset-md-4'><a href='?page=1'><button class='btn-outline-dark'>First</button></a></div>";
+
+	    //кнопка Prev (предыдущая страница)
+	    echo "<div class='col-md-1'><a href='?page=". ($page - 1) . "'>
+	    	<button class='btn-outline-dark'";
+	    if($page <= 1) echo " disabled";
+	    echo ">Prev</button></a></div>";
+
+	    // кнопка Next (следующее)
+	    echo "<div class='col-md-1'><a href='?page=". ($page + 1) . "'>
+	    	<button class='btn-outline-dark'";
+	    if($page >= $total) echo " disabled";
+	    echo ">Next</button></a></div>";
+
+	    //кнопка Last (в конец)
+	    echo "<div class='col-md-1'><a href='?page=$total'>
+	    	<button class='btn-outline-dark'>Last</button></a></li></div>";
+
+	    echo "</div><br>";
+    ?>
+    
 	</div>
 	</body>
 	

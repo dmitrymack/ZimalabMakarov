@@ -1,10 +1,11 @@
 <?php
 	class Client{
 		private $conn;
-		private $table = "clients";
+		private $table;
 
-		public function __construct($db){
+		public function __construct($db, $table){
 			$this->conn = $db;
+			$this->table = $table;
 		}
 
 		public function create(array $resp){
@@ -16,11 +17,18 @@
 			return $add->execute();
 		}
 
-		public function readAll(){
-			$query = "SELECT * FROM $this->table";
+		public function readPage($from, $limit){
+			$query = "SELECT * FROM $this->table LIMIT $from, $limit";
 			$read = $this->conn->prepare($query);
 			$read->execute();
 			return $read;
 		} 
+
+		public function length(){
+			$query = "SELECT COUNT(*) FROM $this->table";
+			$count = $this->conn->prepare($query);
+			$count->execute();
+			return $count->fetch()[0];
+		}
 	}
 ?>
