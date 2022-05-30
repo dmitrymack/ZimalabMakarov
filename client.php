@@ -30,7 +30,7 @@
 			$count->execute();
 			return $count->fetch()[0];
 		}
-		
+
 		public function getIdThroughEmailField($email){
 			$query = "SELECT id FROM $this->table WHERE email='$email'";
 			$id = $this->conn->prepare($query);
@@ -42,6 +42,28 @@
 			$query = "DELETE FROM $this->table WHERE id = $id";
 			$del = $this->conn->prepare($query);
 			return $del->execute();
+		}
+
+		public function readOneById($id){
+			$query = "SELECT * FROM $this->table WHERE id='$id'";
+			$one = $this->conn->prepare($query);
+			$one->execute();
+			return $one;
+		}
+
+		public function update($id, array $resp){
+			$query = "UPDATE $this->table SET
+				first_name = '$resp[0]',
+				last_name = '$resp[1]',
+				email = '$resp[2]',
+				company_name = '$resp[3]',
+				position = '$resp[4]',
+				phone_1 = '$resp[5]',
+				phone_2 = '$resp[6]', 
+				phone_3 = '$resp[7]'
+				WHERE id = $id";
+			$upd = $this->conn->prepare($query);
+			return $upd->execute();
 		}
 	}
 ?>

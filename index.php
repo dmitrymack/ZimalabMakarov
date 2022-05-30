@@ -8,7 +8,7 @@
 
 	$client = new Client($db, 'clients');
 
-	if($_POST['del']){ // удаление из базы и вывод сообщения вверху страницы
+	if(isset($_POST['del'])){ // удаление из базы и вывод сообщения вверху страницы
 		if ($client->delete($_POST['del'])) {
         	echo "<div class='alert alert-success container'>Клиент Удален!</div>";
     	}
@@ -17,7 +17,9 @@
     	}
 	}
 
-	if($_POST['first_name'] and $_POST['last_name'] and $_POST['email']){
+	if(isset($_POST['first_name']) and isset($_POST['last_name']) and 
+		isset($_POST['email']))
+	{
 		// создание массива из данных post запроса
 		$arr = array($_POST['first_name'], $_POST['last_name'], $_POST['email'], 
 			$_POST['company_name'], $_POST['position'], $_POST['phone_1'], 
@@ -144,9 +146,9 @@
 						echo "<td>$phone_2</td>";
 						echo "<td>$phone_3</td>";
 						echo "<td><div class='row'>
-						<form action='index.php' method='post'>
+						<form action='update.php' method='get'>
 							<button class='btn btn-light'>$change</button>
-							<input type='hidden' value='$id' />
+							<input type='hidden' name='id' value='$id' />
 						</form>
 						<form action='index.php' method='post'>
 							<button class='btn btn-light'>$del</button>
