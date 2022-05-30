@@ -1,6 +1,7 @@
 <?php
 	include_once 'database.php';
 	include_once 'client.php';
+	include_once 'functions.php';
 
 
 	$db = new Database(); // класс Database создан мной
@@ -18,11 +19,13 @@
 	}
 
 	if(isset($_POST['first_name']) and isset($_POST['last_name']) and 
-		isset($_POST['email']))
+		isset($_POST['email']) and hasEmail($client, $_POST['email']) and
+		checkPhones($client, 
+			$_POST['phone_1'], $_POST['phone_2'], $_POST['phone_3']))
 	{
 		// создание массива из данных post запроса
 		$arr = array($_POST['first_name'], $_POST['last_name'], $_POST['email'], 
-			$_POST['company_name'], $_POST['position'], $_POST['phone_1'], 
+			$_POST['company_name'], $_POST['position'], 
 			$_POST['phone_1'], $_POST['phone_2'], $_POST['phone_3']);
 
 		if ($client->create($arr)) { 

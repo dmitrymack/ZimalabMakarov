@@ -1,6 +1,7 @@
 <?php
 	include_once 'database.php';
 	include_once 'client.php';
+	include_once 'functions.php';
 
 	$db = new Database();
 	$db = $db->getConnection();
@@ -21,15 +22,20 @@
     	}
 
 		$arr = array($_POST['first_name'], $_POST['last_name'], $_POST['email'], 
-			$_POST['company_name'], $_POST['position'], $_POST['phone_1'], 
+			$_POST['company_name'], $_POST['position'], 
 			$_POST['phone_1'], $_POST['phone_2'], $_POST['phone_3']);
 
-		// вывод сообщений об успехе или неудаче
-		if ($client->update($id, $arr)) {
-        	echo "<div class='alert alert-success container'>Данные клиента изменены!</div>";
-    	}
-    	else {
-    		echo "<div class='alert alert-danger container'>Невозможно изменить данные клиента.</div>";
+		if(checkPhones($client, $_POST['phone_1'], 
+			$_POST['phone_2'], $_POST['phone_3'])) 
+		{
+
+			// вывод сообщений об успехе или неудаче
+			if ($client->update($id, $arr)) {
+	        	echo "<div class='alert alert-success container'>Данные клиента изменены!</div>";
+	    	}
+	    	else {
+	    		echo "<div class='alert alert-danger container'>Невозможно изменить данные клиента.</div>";
+	    	}
     	}
 	}
 
